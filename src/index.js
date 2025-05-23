@@ -1,4 +1,5 @@
 // src/index.js
+const unused = 'break eslint';
 
 require('dotenv').config(); // <-- Load .env variables first
 const logger = require('./logger');
