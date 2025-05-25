@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const compression = require('compression');
 const passport = require('passport');
 const logger = require('./logger');
+const { createErrorResponse } = require('./response');
 const pino = require('pino-http')({ logger });
 
 const authenticate = require('./auth');
@@ -26,11 +27,9 @@ app.use('/', require('./routes'));
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({
-    status: 'error',
-    error: { message: 'not found', code: 404 },
-  });
+  res.status(404).json(createErrorResponse(404, 'not found'));
 });
+
 
 // Error handler
 app.use((err, req, res) => {
@@ -38,10 +37,8 @@ app.use((err, req, res) => {
   const message = err.message || 'unable to process request';
   if (status > 499) logger.error({ err }, `Error processing request`);
 
-  res.status(status).json({
-    status: 'error',
-    error: { message, code: status },
-  });
+  res.status(status).json(createErrorResponse(status, message));
+
 });
 
 module.exports = app;
