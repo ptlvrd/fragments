@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../../src/app');
 const base64 = require('base-64');
+const hash = require('../../src/hash'); 
 
 const user = 'user1@email.com';
 const pass = 'password1';
@@ -36,6 +37,6 @@ describe('POST /v1/fragments', () => {
     expect(res.body.fragment).toBeDefined();
     expect(res.body.fragment.type).toBe('text/plain');
     expect(res.body.fragment.size).toBe(11);
-    expect(res.body.fragment.ownerId).toBe(user);
+    expect(res.body.fragment.ownerId).toBe(hash(user));
   });
 });

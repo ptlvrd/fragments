@@ -1,7 +1,9 @@
+// src/auth/cognito.js
 const passport = require('passport');
 const BearerStrategy = require('passport-http-bearer').Strategy;
 const { CognitoJwtVerifier } = require('aws-jwt-verify');
 const logger = require('../logger');
+const authorize = require('./auth-middleware');
 
 const jwtVerifier = CognitoJwtVerifier.create({
   userPoolId: process.env.AWS_COGNITO_POOL_ID,
@@ -11,7 +13,8 @@ const jwtVerifier = CognitoJwtVerifier.create({
 
 logger.info('Configured to use AWS Cognito for Authorization');
 
-jwtVerifier.hydrate()
+jwtVerifier
+  .hydrate()
   .then(() => logger.info('Cognito JWKS successfully cached'))
   .catch((err) => logger.error({ err }, 'Unable to cache Cognito JWKS'));
 
@@ -27,5 +30,4 @@ module.exports.strategy = () =>
     }
   });
 
-module.exports.authenticate = () =>
-  passport.authenticate('bearer', { session: false });
+module.exports.authenticate = () => authorize('bearer');

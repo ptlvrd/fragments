@@ -186,7 +186,8 @@ describe('Fragment class', () => {
       await fragment.save();
       await fragment.setData(Buffer.from('bye'));
       await Fragment.delete('user', fragment.id);
-      await expect(Fragment.byId('user', fragment.id)).rejects.toThrow();
+      const deletedFragment = await Fragment.byId('user', fragment.id);
+      expect(deletedFragment).toBeNull();
     });
   });
 });

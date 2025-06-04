@@ -35,7 +35,7 @@ class Fragment {
 
   static async byId(ownerId, id) {
     const data = await readFragment(ownerId, id);
-    if (!data) throw new Error('Fragment not found');
+    if (!data) return null;
     return new Fragment(data);
   }
 
