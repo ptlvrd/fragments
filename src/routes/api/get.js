@@ -1,9 +1,11 @@
-const { createSuccessResponse } = require('../../response');
+const { Fragment } = require('../../model/fragment');
+const { createSuccessResponse, createErrorResponse } = require('../../response');
 
-module.exports = (req, res) => {
-  res.status(200).json(
-    createSuccessResponse({
-      fragments: [],
-    })
-  );
+module.exports = async (req, res) => {
+  try {
+    const fragments = await Fragment.byUser(req.user);
+    res.status(200).json(createSuccessResponse({ fragments }));
+  } catch (err) {
+    res.status(500).json(createErrorResponse(500, 'Failed to retrieve fragments'));
+  }
 };

@@ -7,7 +7,7 @@ const { Fragment } = require('../../model/fragment');
 
 // Define the GET /v1/fragments route
 router.get('/fragments', require('./get'));
-
+router.get('/fragments/:id', require('./get-id'));
 // Middleware to parse raw body for supported Content-Types (up to 5MB)
 const rawBody = () =>
   express.raw({
