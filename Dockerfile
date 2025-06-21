@@ -1,7 +1,7 @@
 # Dockerfile for Fragments Microservice
 
 # 1. Base image
-FROM node:22.12.0
+FROM node:22.12.0-alpine
 
 # 2. Metadata
 LABEL maintainer="Vrunda Patel <vvpatel20@myseneca.ca>"
