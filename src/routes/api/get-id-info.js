@@ -1,6 +1,5 @@
 // src/routes/api/get-id-info.js
 
-const express = require('express');
 const { readFragment } = require('../../model/data/memory');
 const Fragment = require('../../model/fragment');
 
