@@ -12,8 +12,6 @@ const {
   deleteFragment,
 } = require('./data/memory');
 
-const supportedTypes = ['text/plain', 'application/json'];
-
 class Fragment {
   constructor({ id, ownerId, created, updated, type, size = 0 }) {
     if (!ownerId || !type) throw new Error('ownerId and type are required');
