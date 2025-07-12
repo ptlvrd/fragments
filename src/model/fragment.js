@@ -12,7 +12,7 @@ const {
   deleteFragment,
 } = require('./data/memory');
 
-const supportedTypes = ['text/plain'];
+const supportedTypes = ['text/plain', 'application/json'];
 
 class Fragment {
   constructor({ id, ownerId, created, updated, type, size = 0 }) {
@@ -75,7 +75,7 @@ class Fragment {
   static isSupportedType(value) {
     try {
       const { type } = contentType.parse(value);
-      return supportedTypes.includes(type);
+      return type.startsWith('text/') || type === 'application/json';
     } catch {
       return false;
     }

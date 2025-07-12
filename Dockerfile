@@ -1,34 +1,40 @@
-# Dockerfile for Fragments Microservice
+# ========================
+# Build Stage
+# ========================
+FROM node:22-alpine AS builder
 
-# 1. Base image
-FROM node:22.12.0-alpine
-
-# 2. Metadata
-LABEL maintainer="Vrunda Patel <vvpatel20@myseneca.ca>"
-LABEL description="Fragments node.js microservice"
-
-# 3. Environment variables
-ENV PORT=8080
-ENV NPM_CONFIG_LOGLEVEL=warn
-ENV NPM_CONFIG_COLOR=false
-
-# 4. Set working directory
+# Set working directory
 WORKDIR /app
 
-# 5. Copy package files
+# Copy package files
 COPY package*.json ./
 
-# 6. Install dependencies
+# Install dependencies (including dev dependencies for testing/build)
 RUN npm install
 
-# 7. Copy app source
-COPY ./src ./src
+# Copy entire source code
+COPY . .
 
-# 8. Copy auth file (Basic Auth only)
-COPY ./tests/.htpasswd ./tests/.htpasswd
+# ========================
+# Production Stage
+# ========================
+FROM node:22-alpine
 
-# 9. Run server
-CMD ["npm", "start"]
+# Set working directory
+WORKDIR /app
 
-# 10. Document exposed port
+# Copy only the needed files from builder
+COPY --from=builder /app .
+
+# Install only production dependencies
+RUN npm install --only=production
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=8080
+
+# Expose port
 EXPOSE 8080
+
+# Run the app
+CMD ["npm", "start"]

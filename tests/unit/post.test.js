@@ -39,4 +39,38 @@ describe('POST /v1/fragments', () => {
     expect(res.body.fragment.size).toBe(11);
     expect(res.body.fragment.ownerId).toBe(hash(user));
   });
+
+  test('authenticated user can post text/markdown fragment', async () => {
+  const res = await request(app)
+    .post('/v1/fragments')
+    .set('Authorization', authHeader)
+    .set('Content-Type', 'text/markdown')
+    .send('# Hello World');
+
+  expect(res.statusCode).toBe(201);
+  expect(res.headers.location).toMatch(/\/v1\/fragments\/.+/);
+  expect(res.body.status).toBe('ok');
+  expect(res.body.fragment).toBeDefined();
+  expect(res.body.fragment.type).toBe('text/markdown');
+  expect(res.body.fragment.size).toBe(13);
+  expect(res.body.fragment.ownerId).toBe(hash(user));
+});
+
+test('authenticated user can post application/json fragment', async () => {
+  const jsonData = JSON.stringify({ message: "Hello, JSON" });
+  const res = await request(app)
+    .post('/v1/fragments')
+    .set('Authorization', authHeader)
+    .set('Content-Type', 'application/json')
+    .send(jsonData);
+
+  expect(res.statusCode).toBe(201);
+  expect(res.headers.location).toMatch(/\/v1\/fragments\/.+/);
+  expect(res.body.status).toBe('ok');
+  expect(res.body.fragment).toBeDefined();
+  expect(res.body.fragment.type).toBe('application/json');
+  expect(res.body.fragment.size).toBe(Buffer.byteLength(jsonData));
+  expect(res.body.fragment.ownerId).toBe(hash(user));
+});
+
 });

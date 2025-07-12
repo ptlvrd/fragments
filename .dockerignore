@@ -10,3 +10,6 @@ eslint.config.mjs
 .gitignore
 .prettier*
 jest*
+Dockerfile
+.dockerignore
+npm-debug.log
