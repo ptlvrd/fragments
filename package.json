@@ -16,10 +16,12 @@
     "lint": "eslint \"./src/**/*.js\" \"tests/**/*.js\"",
     "start": "node src/index.js",
     "dev": "cross-env LOG_LEVEL=debug nodemon src/index.js --watch src",
-    "debug": "cross-env LOG_LEVEL=debug node --inspect-brk src/index.js"
+    "debug": "cross-env LOG_LEVEL=debug node --inspect-brk src/index.js",
+    "test:integration": "hurl --test --glob \"tests/integration/**/*.hurl\""
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
+    "@orangeopensource/hurl": "^6.1.1",
     "cross-env": "^7.0.3",
     "eslint": "^9.27.0",
     "globals": "^16.1.0",
