@@ -37,9 +37,21 @@ class Fragment {
     return new Fragment(data);
   }
 
-  static delete(ownerId, id) {
-    return deleteFragment(ownerId, id);
+  static async delete(ownerId, id) {
+  try {
+    // First verify the fragment exists
+    const fragment = await Fragment.byId(ownerId, id);
+    if (!fragment) {
+      throw new Error('Fragment not found');
+    }
+    
+    // Delete both metadata and data
+    await deleteFragment(ownerId, id);
+    return true;
+  } catch (err) {
+    throw new Error(`Unable to delete fragment: ${err.message}`);
   }
+}
 
   async save() {
     this.updated = new Date().toISOString();

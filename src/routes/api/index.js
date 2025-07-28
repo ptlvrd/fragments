@@ -9,6 +9,7 @@ const { Fragment } = require('../../model/fragment');
 router.get('/fragments', require('./get'));
 router.get('/fragments/:id', require('./get-id'));
 router.get('/fragments/:id/info', require('./get-id-info'));
+router.delete('/fragments/:id', require('./delete'));
 
 // Middleware to parse raw body for supported Content-Types (up to 5MB)
 const rawBody = () =>
