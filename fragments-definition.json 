@@ -1,9 +1,9 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:us-east-1:339712717594:task-definition/fragments-task:1",
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:339712717594:task-definition/fragments-task:2",
     "containerDefinitions": [
         {
             "name": "fragments",
-            "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/fragments:latest",
+            "image": "339712717594.dkr.ecr.us-east-1.amazonaws.com/fragments:latest",
             "cpu": 0,
             "portMappings": [
                 {
@@ -15,13 +15,19 @@
                 }
             ],
             "essential": true,
-            "environment": [],
-            "environmentFiles": [
+            "environment": [
                 {
-                    "value": "arn:aws:s3:::vvpatel20-fragments/fragments.env",
-                    "type": "s3"
+                    "name": "AWS_S3_BUCKET_NAME",
+                    "value": "vvpatel20-fragments"
                 }
             ],
+            "environmentFiles": [
+  {
+    "value": "arn:aws:s3:::vvpatel20-fragments/fragments.env",
+    "type": "s3"
+  }
+]
+,
             "mountPoints": [],
             "volumesFrom": [],
             "ulimits": [],
@@ -42,7 +48,7 @@
     "taskRoleArn": "arn:aws:iam::339712717594:role/LabRole",
     "executionRoleArn": "arn:aws:iam::339712717594:role/LabRole",
     "networkMode": "awsvpc",
-    "revision": 1,
+    "revision": 2,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -57,9 +63,6 @@
         },
         {
             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
-        },
-        {
-            "name": "ecs.capability.env-files.s3"
         },
         {
             "name": "com.amazonaws.ecs.capability.task-iam-role"
@@ -91,7 +94,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2025-07-28T02:17:22.199Z",
+    "registeredAt": "2025-07-29T00:02:56.255Z",
     "registeredBy": "arn:aws:sts::339712717594:assumed-role/voclabs/user4078794=vvpatel20@myseneca.ca",
     "enableFaultInjection": false,
     "tags": []
