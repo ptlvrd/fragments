@@ -58,6 +58,12 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+       - name: Copy .env
+        run: cp .env .env
+
+      - name: Print .env
+        run: cat .env
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:

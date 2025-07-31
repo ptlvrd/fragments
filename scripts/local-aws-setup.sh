@@ -28,7 +28,7 @@ fi
 
 # Create DynamoDB table
 echo "Creating DynamoDB table: fragments"
-if aws --endpoint-url=http://localhost:4566 dynamodb create-table \
+if aws --endpoint-url=http://localhost:8000 dynamodb create-table \
     --table-name fragments \
     --attribute-definitions \
         AttributeName=ownerId,AttributeType=S \
@@ -46,12 +46,13 @@ fi
 
 # Wait for table to be active
 echo -n "Waiting for DynamoDB table to be ready..."
-if aws --endpoint-url=http://localhost:4566 dynamodb wait table-exists --table-name fragments; then
+if aws --endpoint-url=http://localhost:8000 dynamodb wait table-exists --table-name fragments; then
     echo -e "\nDynamoDB table is ready"
 else
     echo -e "\nERROR: Timed out waiting for DynamoDB table" >&2
     exit 1
 fi
+
 
 echo "---------------------------------"
 echo "LocalStack setup completed successfully"
