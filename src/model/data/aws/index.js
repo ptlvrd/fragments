@@ -3,6 +3,9 @@ const { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aw
 const logger = require('../../../logger');
 const MemoryDB = require('../memory/memory-db');
 
+// Create memory database instances for metadata storage
+const metadata = new MemoryDB();
+
 // Convert stream to buffer utility function
 const streamToBuffer = (stream) =>
   new Promise((resolve, reject) => {
@@ -15,12 +18,12 @@ const streamToBuffer = (stream) =>
 // Write fragment metadata to memory DB (temporary until DynamoDB is implemented)
 function writeFragment(fragment) {
   const serialized = JSON.stringify(fragment);
-  return MemoryDB.put(fragment.ownerId, fragment.id, serialized);
+  return metadata.put(fragment.ownerId, fragment.id, serialized);
 }
 
 // Read fragment metadata from memory DB
 async function readFragment(ownerId, id) {
-  const serialized = await MemoryDB.get(ownerId, id);
+  const serialized = await metadata.get(ownerId, id);
   return typeof serialized === 'string' ? JSON.parse(serialized) : serialized;
 }
 
@@ -35,7 +38,9 @@ async function writeFragmentData(ownerId, id, data) {
   const command = new PutObjectCommand(params);
 
   try {
+    logger.debug({ Bucket: params.Bucket, Key: params.Key }, 'Attempting to write fragment data to S3');
     await s3Client.send(command);
+    logger.debug({ Bucket: params.Bucket, Key: params.Key }, 'Successfully wrote fragment data to S3');
   } catch (err) {
     const { Bucket, Key } = params;
     logger.error({ err, Bucket, Key }, 'Error uploading fragment data to S3');
@@ -64,7 +69,7 @@ async function readFragmentData(ownerId, id) {
 
 // List fragments from memory DB
 async function listFragments(ownerId, expand = false) {
-  const fragments = await MemoryDB.query(ownerId);
+  const fragments = await metadata.query(ownerId);
   const parsedFragments = fragments.map((fragment) => JSON.parse(fragment));
 
   if (expand || !fragments) {
@@ -87,7 +92,7 @@ async function deleteFragment(ownerId, id) {
     await s3Client.send(new DeleteObjectCommand(s3Params));
     
     // Delete metadata from memory
-    await MemoryDB.del(ownerId, id);
+    await metadata.del(ownerId, id);
     
     return true;
   } catch (err) {

@@ -10,7 +10,7 @@ const {
   writeFragmentData,
   listFragments,
   deleteFragment,
-} = require('./data/memory');
+} = require('./data');
 
 class Fragment {
   constructor({ id, ownerId, created, updated, type, size = 0 }) {
@@ -66,6 +66,8 @@ class Fragment {
     if (!Buffer.isBuffer(data)) throw new Error('Data must be a Buffer');
     this.size = data.length;
     this.updated = new Date().toISOString();
+    const logger = require('../../logger');
+    logger.debug({ ownerId: this.ownerId, id: this.id, size: data.length }, 'setData called');
     await writeFragmentData(this.ownerId, this.id, data);
     await this.save();
   }
