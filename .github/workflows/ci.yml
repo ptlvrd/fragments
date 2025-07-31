@@ -71,8 +71,8 @@ jobs:
       - name: Wait for containers to be ready
         run: sleep 30
       - name: Setup Local AWS Resources
-        # Use Node.js script instead of shell script for CI environment
-        run: node scripts/setup-dynamodb.js
+        # Use comprehensive Node.js script for both S3 and DynamoDB
+        run: node scripts/setup-aws-resources.js
       - name: Verify DynamoDB table
         run: node scripts/verify-dynamodb.js
       - name: Wait for server to be ready
