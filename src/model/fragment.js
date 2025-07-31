@@ -66,7 +66,7 @@ class Fragment {
     if (!Buffer.isBuffer(data)) throw new Error('Data must be a Buffer');
     this.size = data.length;
     this.updated = new Date().toISOString();
-    const logger = require('../../logger');
+    const logger = require('../logger');
     logger.debug({ ownerId: this.ownerId, id: this.id, size: data.length }, 'setData called');
     await writeFragmentData(this.ownerId, this.id, data);
     await this.save();
