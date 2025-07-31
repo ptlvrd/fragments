@@ -73,9 +73,13 @@ jobs:
       - name: Setup Local AWS Resources
         # Use Node.js script instead of shell script for CI environment
         run: node scripts/setup-dynamodb.js
+      - name: Verify DynamoDB table
+        run: node -e "const { DynamoDBClient, ListTablesCommand } = require('@aws-sdk/client-dynamodb'); const client = new DynamoDBClient({ region: 'us-east-1', endpoint: 'http://dynamodb-local:8000', credentials: { accessKeyId: 'test', secretAccessKey: 'test', sessionToken: 'test' } }); client.send(new ListTablesCommand({})).then(result => { console.log('Available tables:', result.TableNames); if (!result.TableNames.includes('fragments')) { throw new Error('fragments table not found'); } }).catch(console.error)"
       - name: Wait for server to be ready
         run: |
           timeout 60 bash -c 'until curl -f http://localhost:8080/; do sleep 2; done'
+      - name: Check server logs
+        run: docker logs fragments-fragments-1
       - name: Run Hurl Tests
         run: npm run test:integration
 
