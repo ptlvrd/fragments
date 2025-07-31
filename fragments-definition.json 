@@ -1,5 +1,5 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:us-east-1:339712717594:task-definition/fragments-task:2",
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:339712717594:task-definition/fragments-task:4",
     "containerDefinitions": [
         {
             "name": "fragments",
@@ -17,17 +17,44 @@
             "essential": true,
             "environment": [
                 {
+                    "name": "AWS_REGION",
+                    "value": "us-east-1"
+                },
+                {
+                    "name": "AWS_COGNITO_POOL_ID",
+                    "value": "us-east-1_hRvAQAmtO"
+                },
+                {
+                    "name": "API_URL",
+                    "value": "http://fragments-alb-860861613.us-east-1.elb.amazonaws.com"
+                },
+                {
+                    "name": "PORT",
+                    "value": "80"
+                },
+                {
                     "name": "AWS_S3_BUCKET_NAME",
                     "value": "vvpatel20-fragments"
+                },
+                {
+                    "name": "NODE_ENV",
+                    "value": "production"
+                },
+                {
+                    "name": "LOG_LEVEL",
+                    "value": "debug"
+                },
+                {
+                    "name": "AWS_COGNITO_CLIENT_ID",
+                    "value": "2jagqc7ajr9ggeilp5i2tn0r02"
                 }
             ],
             "environmentFiles": [
-  {
-    "value": "arn:aws:s3:::vvpatel20-fragments/fragments.env",
-    "type": "s3"
-  }
-]
-,
+                {
+                    "value": "arn:aws:s3:::vvpatel20-fragments/fragments.env",
+                    "type": "s3"
+                }
+            ],
             "mountPoints": [],
             "volumesFrom": [],
             "ulimits": [],
@@ -48,7 +75,7 @@
     "taskRoleArn": "arn:aws:iam::339712717594:role/LabRole",
     "executionRoleArn": "arn:aws:iam::339712717594:role/LabRole",
     "networkMode": "awsvpc",
-    "revision": 2,
+    "revision": 4,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -63,6 +90,9 @@
         },
         {
             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "ecs.capability.env-files.s3"
         },
         {
             "name": "com.amazonaws.ecs.capability.task-iam-role"
@@ -94,7 +124,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2025-07-29T00:02:56.255Z",
+    "registeredAt": "2025-07-31T16:50:02.855Z",
     "registeredBy": "arn:aws:sts::339712717594:assumed-role/voclabs/user4078794=vvpatel20@myseneca.ca",
     "enableFaultInjection": false,
     "tags": []
