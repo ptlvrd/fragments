@@ -30,6 +30,10 @@ const dynamoDBClient = new DynamoDBClient({
 async function createS3Bucket() {
   const bucketName = 'vvpatel20-fragments';
   
+  // First, wait a bit for LocalStack to be fully ready
+  console.log('Waiting for LocalStack to be ready...');
+  await new Promise(resolve => setTimeout(resolve, 5000));
+  
   for (let attempt = 1; attempt <= 5; attempt++) {
     try {
       console.log(`Attempt ${attempt} to create S3 bucket...`);
@@ -51,18 +55,48 @@ async function createS3Bucket() {
       }
     } catch (error) {
       // Handle LocalStack-specific errors more gracefully
-      if (error.code === 'ECONNRESET' || error.code === 'ENOTFOUND' || error.code === 'ENOTFOUND') {
-        console.log(`Connection error on attempt ${attempt}, retrying in 2 seconds...`);
+      if (error.code === 'ECONNRESET' || error.code === 'ENOTFOUND') {
+        console.log(`Connection error on attempt ${attempt}, retrying in 3 seconds...`);
         if (attempt < 5) {
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise(resolve => setTimeout(resolve, 3000));
           continue;
         }
       }
       
-      // If we get a 500 error from LocalStack, assume bucket exists or skip
+      // If we get a 500 error from LocalStack, try HTTP fallback immediately
       if (error.$metadata?.httpStatusCode === 500) {
-        console.log('LocalStack returned 500 error, assuming S3 bucket exists or skipping...');
-        return;
+        console.log('LocalStack returned 500 error, trying HTTP fallback...');
+        try {
+          const http = require('http');
+          const options = {
+            hostname: 'localhost',
+            port: 4566,
+            path: `/${bucketName}`,
+            method: 'PUT'
+          };
+          
+          return new Promise((resolve) => {
+            const req = http.request(options, (res) => {
+              if (res.statusCode === 200) {
+                console.log('S3 bucket created successfully via HTTP request');
+                resolve();
+              } else {
+                console.log(`HTTP request failed with status ${res.statusCode}, assuming bucket exists`);
+                resolve();
+              }
+            });
+            
+            req.on('error', (err) => {
+              console.log('HTTP request failed, assuming bucket exists or skipping...');
+              resolve();
+            });
+            
+            req.end();
+          });
+        } catch (httpError) {
+          console.log('HTTP fallback failed, continuing without S3 bucket...');
+          return;
+        }
       }
       
       // For any other error, try to create bucket using direct HTTP request as fallback
@@ -77,7 +111,7 @@ async function createS3Bucket() {
             method: 'PUT'
           };
           
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve) => {
             const req = http.request(options, (res) => {
               if (res.statusCode === 200) {
                 console.log('S3 bucket created successfully via HTTP request');

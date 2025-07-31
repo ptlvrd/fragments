@@ -70,6 +70,12 @@ jobs:
         run: docker compose up -d
       - name: Wait for containers to be ready
         run: sleep 30
+      - name: Check container status
+        run: docker ps
+      - name: Check LocalStack health
+        run: curl -f http://localhost:4566/_localstack/health || echo "LocalStack not ready yet"
+      - name: Check DynamoDB Local health
+        run: curl -f http://localhost:8000 || echo "DynamoDB Local not ready yet"
       - name: Setup Local AWS Resources
         # Use comprehensive Node.js script for both S3 and DynamoDB
         run: node scripts/setup-aws-resources.js
