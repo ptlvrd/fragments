@@ -126,6 +126,5 @@
     },
     "registeredAt": "2025-07-31T16:50:02.855Z",
     "registeredBy": "arn:aws:sts::339712717594:assumed-role/voclabs/user4078794=vvpatel20@myseneca.ca",
-    "enableFaultInjection": false,
     "tags": []
 }
