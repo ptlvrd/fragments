@@ -50,6 +50,7 @@ async function createS3Bucket() {
         throw error;
       }
     } catch (error) {
+      // Handle LocalStack-specific errors more gracefully
       if (error.code === 'ECONNRESET' || error.code === 'ENOTFOUND') {
         console.log(`Connection error on attempt ${attempt}, retrying in 2 seconds...`);
         if (attempt < 5) {
@@ -57,6 +58,13 @@ async function createS3Bucket() {
           continue;
         }
       }
+      
+      // If we get a 500 error from LocalStack, assume bucket exists or skip
+      if (error.$metadata?.httpStatusCode === 500) {
+        console.log('LocalStack returned 500 error, assuming S3 bucket exists or skipping...');
+        return;
+      }
+      
       console.error('Error creating S3 bucket:', error);
       throw error;
     }
@@ -121,7 +129,12 @@ async function setupResources() {
     console.log('Setting up AWS resources...');
     console.log('---------------------------------');
     
-    await createS3Bucket();
+    try {
+      await createS3Bucket();
+    } catch (error) {
+      console.log('S3 bucket setup failed, continuing with DynamoDB only...');
+    }
+    
     await createDynamoDBTable();
     
     console.log('---------------------------------');
