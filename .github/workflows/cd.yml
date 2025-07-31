@@ -50,6 +50,6 @@ jobs:
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          cluster: fragments-cluster
-          service: fragments-service
+          cluster: fragments
+          service: fragments-services
           task-definition: ${{ steps.task-def.outputs.task-definition }}
