@@ -3,9 +3,24 @@
 const { Fragment } = require('../../model/fragment');
 const { createErrorResponse } = require('../../response');
 const logger = require('../../logger');
-const markdownIt = require('markdown-it');
-const md = new markdownIt();
 const path = require('path');
+
+// Map file extensions to MIME types
+const extensionToMimeType = {
+  '.txt': 'text/plain',
+  '.md': 'text/markdown',
+  '.html': 'text/html',
+  '.csv': 'text/csv',
+  '.json': 'application/json',
+  '.yaml': 'application/yaml',
+  '.yml': 'application/yaml',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.gif': 'image/gif',
+  '.avif': 'image/avif',
+};
 
 module.exports = async (req, res) => {
   try {
@@ -19,16 +34,29 @@ module.exports = async (req, res) => {
       return res.status(404).json(createErrorResponse(404, 'Fragment not found'));
     }
 
-    const data = await fragment.getData();
+    // If extension is provided, attempt conversion
+    if (ext) {
+      const targetType = extensionToMimeType[ext];
+      if (!targetType) {
+        logger.warn({ ext }, 'Unsupported file extension');
+        return res.status(415).json(createErrorResponse(415, 'Unsupported file extension'));
+      }
 
-    // Handle Markdown to HTML conversion
-    if (ext === '.html' && fragment.type === 'text/markdown') {
-      const html = md.render(data.toString());
-      res.setHeader('Content-Type', 'text/html');
-      return res.status(200).send(html);
+      try {
+        const convertedData = await fragment.convertTo(targetType);
+        res.setHeader('Content-Type', targetType);
+        return res.status(200).send(convertedData);
+      } catch (conversionError) {
+        logger.warn(
+          { fragmentType: fragment.type, targetType, error: conversionError.message },
+          'Fragment conversion failed'
+        );
+        return res.status(415).json(createErrorResponse(415, 'Fragment conversion not supported'));
+      }
     }
 
-    // If no extension or unsupported conversion, return raw
+    // If no extension, return raw data
+    const data = await fragment.getData();
     res.setHeader('Content-Type', fragment.type);
     return res.status(200).send(data);
   } catch (err) {

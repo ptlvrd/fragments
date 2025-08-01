@@ -45,6 +45,10 @@
                     "value": "debug"
                 },
                 {
+    "name": "AWS_DYNAMODB_TABLE_NAME",
+    "value": "fragments"
+},
+                {
                     "name": "AWS_COGNITO_CLIENT_ID",
                     "value": "2jagqc7ajr9ggeilp5i2tn0r02"
                 }

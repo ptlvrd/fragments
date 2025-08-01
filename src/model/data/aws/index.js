@@ -3,6 +3,23 @@ const ddbDocClient = require('./ddbDocClient');
 const { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const logger = require('../../../logger');
 
+// Validate required environment variables
+if (!process.env.AWS_DYNAMODB_TABLE_NAME) {
+  logger.error('AWS_DYNAMODB_TABLE_NAME environment variable is not set');
+  throw new Error('AWS_DYNAMODB_TABLE_NAME environment variable is required');
+}
+
+if (!process.env.AWS_REGION) {
+  logger.error('AWS_REGION environment variable is not set');
+  throw new Error('AWS_REGION environment variable is required');
+}
+
+logger.info({ 
+  tableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+  region: process.env.AWS_REGION,
+  endpoint: process.env.AWS_DYNAMODB_ENDPOINT_URL || 'AWS default'
+}, 'DynamoDB configuration loaded');
+
 // Convert stream to buffer utility function
 const streamToBuffer = (stream) =>
   new Promise((resolve, reject) => {
@@ -15,7 +32,7 @@ const streamToBuffer = (stream) =>
 const { PutCommand, GetCommand, QueryCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
 
 // Writes a fragment to DynamoDB. Returns a Promise.
-function writeFragment(fragment) {
+async function writeFragment(fragment) {
   // Configure our PUT params, with the name of the table and item (attributes and keys)
   const params = {
     TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
@@ -26,9 +43,28 @@ function writeFragment(fragment) {
   const command = new PutCommand(params);
 
   try {
-    return ddbDocClient.send(command);
+    logger.debug({ 
+      tableName: process.env.AWS_DYNAMODB_TABLE_NAME, 
+      fragmentId: fragment.id,
+      ownerId: fragment.ownerId 
+    }, 'Attempting to write fragment to DynamoDB');
+    
+    const result = await ddbDocClient.send(command);
+    logger.debug({ 
+      tableName: process.env.AWS_DYNAMODB_TABLE_NAME, 
+      fragmentId: fragment.id,
+      ownerId: fragment.ownerId 
+    }, 'Successfully wrote fragment to DynamoDB');
+    
+    return result;
   } catch (err) {
-    logger.warn({ err, params, fragment }, 'error writing fragment to DynamoDB');
+    logger.error({ 
+      err, 
+      params, 
+      fragment,
+      tableName: process.env.AWS_DYNAMODB_TABLE_NAME,
+      region: process.env.AWS_REGION
+    }, 'Error writing fragment to DynamoDB');
     throw err;
   }
 }
