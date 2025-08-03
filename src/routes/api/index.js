@@ -3,6 +3,7 @@
 const express = require('express');
 const contentType = require('content-type');
 const { Fragment } = require('../../model/fragment');
+const logger = require('../../logger');
 
 // Support sending various Content-Types on the body up to 5M in size
 const rawBody = () =>
